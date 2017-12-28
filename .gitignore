@@ -1,0 +1,11 @@
+core
+*.tmp
+*.bz2
+*.gz
+*.tar
+*~
+*.swp
+sf/
+*.xls
+*.csv
+*.o
