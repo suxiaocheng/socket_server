@@ -22,7 +22,6 @@ int msg_thread_init(void *addr);
  * is at least 2048
  * @buf:	
  * @return:	-1: fail, >0: number of bytes get from server.
- * Description: Used to connect to socket.
  */
 int receive_from_server(char *buf);
 /**
