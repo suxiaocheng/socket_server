@@ -145,7 +145,7 @@ int main(int argc , char **argv)
 	signal((int) SIGINT, (sighandler_t) signal_handler); /* handle user interrupt */
     	signal((int) SIGTERM, (sighandler_t) signal_handler);	/* handle kill from shell */
 
-	init_log_file();
+	init_log_file("/tmp/socket.log");
 
 	parent_pid = getpid();
 	

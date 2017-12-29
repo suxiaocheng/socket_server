@@ -7,7 +7,7 @@ OBJ := $(patsubst %.c,%.o,${SRC})
 
 all:client server
 
-client: client.o debug.o
+client: client.o debug.o test_client.o
 	$(CC) $(LDFLAGS) -o $@ $^
 
 server: server.o debug.o
@@ -22,5 +22,5 @@ depend:
 
 .PHONY: clean
 clean:
-	rm *.o ${OBJ} depend -rf
+	rm *.o ${OBJ} depend client server -rf
 

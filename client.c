@@ -5,15 +5,7 @@
 #include "config.h"
 pid_t send_pid, recv_pid;
 
-#ifndef FALSE
-#define FALSE 0
-#endif
-
-#ifndef TRUE
-#define TRUE 1
-#endif
-
-void msg_thread_init(void *addr)
+int msg_thread_init(void *addr)
 {
 	int sockfd;
 	struct sockaddr_in servaddr;
@@ -24,7 +16,7 @@ void msg_thread_init(void *addr)
 	if((sockfd = socket(AF_INET , SOCK_STREAM , 0)) == -1)
 	{
 		printf("socket error");
-		exit(1);
+		return 1;
 	}
 
 	/*(2) 设置链接服务器地址结构*/
@@ -34,14 +26,14 @@ void msg_thread_init(void *addr)
 	if(inet_pton(AF_INET , addr, &servaddr.sin_addr) < 0)
 	{
 		printf("inet_pton error for %s\n", (char *)addr);
-		exit(1);
+		return 1;
 	}
 
 	/*(3) 发送链接服务器请求*/
 	if( connect(sockfd , (struct sockaddr *)&servaddr , sizeof(servaddr)) < 0)
 	{
 		printf("connect error");
-		exit(1);
+		return 1;
 	}
 
 	/*(4) 消息处理*/
@@ -81,7 +73,6 @@ void msg_thread_init(void *addr)
 				err("pid%d, create send msg queue fail\n", getpid());
 			}
 			while(1){
-				debug("pid%d, ready to read data\n", getpid());
 				ret = read(sockfd, recvline, MAX_LINE);
 				if(ret != -1){
 					debug("pid%d: recv data from server:\n", getpid());
@@ -97,7 +88,6 @@ void msg_thread_init(void *addr)
 						}
 						break;
 					} else {
-						debug("id: %d, sequence: %d, ret: %d \n", msgid, sizeof(msg_sequence), ret);
 						ret = msgsnd(msgid, &recvline[sizeof(msg_sequence)-1], 
 							ret - (sizeof(msg_sequence)-1), 0);
 						if(ret == -1) {
@@ -118,6 +108,7 @@ void msg_thread_init(void *addr)
 	
 	/*(5) 关闭套接字*/
 	close(sockfd);
+	return 0;
 }
 
 int receive_from_server(char *buf)
@@ -143,43 +134,4 @@ int send_to_server(char *buf, int length)
 	return ret;
 }
 
-int main(int argc, char **argv)
-{
-	char buf[1024];
-	ssize_t length;
-	int need_quit = FALSE;
-	msg_thread_init("127.0.0.1");
 
-	while(1){
-		debug("Please input a string\n");
-		length = read(STDIN_FILENO, buf, sizeof(buf));
-		buf[length] = 0;
-		debug("Get std input:\n");
-		dump_memory(buf, length);
-		switch(buf[0]){
-			case 'q':
-			need_quit = TRUE;
-			break;
-			case 'w':
-			send_to_server(&buf[1], length-1);
-			break;
-			case 'r':
-			length = receive_from_server(buf);
-			if(length > 0) {
-				buf[length] = 0;
-				printf("%s\n", buf);
-			}else {
-				printf("length: %d\n", (int)length);
-			}
-			break;
-			default:
-			printf("%s\n", buf);
-			break;
-		}
-		if(need_quit == TRUE){
-			break;
-		}
-	}
-
-	return 0;
-}

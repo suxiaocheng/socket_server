@@ -7,7 +7,7 @@
 #define LOG_ENABLE
 #define LOG_OUTPUT_STD
 
-void init_log_file(void);
+void init_log_file(char *path);
 int close_log_file(void);
 int err(char *str,...);
 

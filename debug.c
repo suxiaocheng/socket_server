@@ -10,10 +10,10 @@
 FILE *fp_log = NULL;
 #define LOG_FILE_NAME "/tmp/socket.log"
 
-void init_log_file(void)
+void init_log_file(char *path)
 {
 	if (fp_log == 0) {
-		fp_log = fopen(LOG_FILE_NAME, "wb+");
+		fp_log = fopen(path, "wb+");
 	}
 }
 
